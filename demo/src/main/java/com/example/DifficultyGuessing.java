@@ -12,6 +12,9 @@ import java.util.Scanner;
  *      Medium: Number between 1 and 100.                                                                                       X
  *      Hard: Number between 1 and 500.                                                                                         X
  *      Adjust the number of allowed attempts based on the difficulty level.                                                    X
+ * 
+ * Can be called statically from other classes and run normally but I use GuessingGame.java to
+ * choose from the other modes.
  */
 public class DifficultyGuessing {
 
@@ -24,7 +27,7 @@ public class DifficultyGuessing {
     // Number 1 is associated with easy difficulty, 2 with medium,
     // and 3 with hard. Each difficulty has their unique values for
     // amount of guesses allowed and the range of possible values.
-    static private void setDifficulty() {
+    static private Boolean setDifficulty() {
 
         // Explain difficulty differences to user.
         System.out.println("Set your difficulty from Easy to Hard.");
@@ -38,7 +41,11 @@ public class DifficultyGuessing {
             System.out.print("> ");
 
             // Gather response from user.
-            String response = reader.nextLine();
+            String response = "";
+            if(reader.hasNext())
+                response = reader.nextLine();
+            else
+                return false;
             
             // Catch exception if user types a string.
             int difficulty;
@@ -52,33 +59,31 @@ public class DifficultyGuessing {
             // Exiting early.
             if(difficulty == 0) {
                 System.out.println("Goodbye!");
-                System.exit(0);
+                return false;
             }
             // Set easy settings
             else if(difficulty == 1) {
                 guessAmount = 30;
                 range = 50;
-                break;
+                return true;
             }
             // Set medium settings
             else if (difficulty == 2) {
                 guessAmount = 25;
                 range = 100;
-                break;
+                return true;
             }
             // Set hard settings
             else if (difficulty == 3) {
                 guessAmount = 10;
                 range = 500;
-                break;
+                return true;
             }
             // Response was invalid.
             else {
                 System.out.println("Invalid response. Enter a number 1-3");
             }
         }
-
-        System.out.println("Settings have been confirmed. Lets begin!");
     }
 
     // userGuessing() will gather user guesses and check if they
@@ -108,7 +113,7 @@ public class DifficultyGuessing {
             if(value == answer)
             {
                 System.out.println("Guessed correct value! Good job! Attempts: " + attempts);
-                System.exit(0);
+                return;
             }
             // If user was incorrect, let them know and hint higher or lower.
             else if(value > answer)
@@ -117,6 +122,9 @@ public class DifficultyGuessing {
                 System.out.println("Incorrect. " + --guessAmount + " guesses left. (Hint: higher!)");
 
         }
+
+        // User has run out of guesses. Close program with a message
+        System.out.println("Sorry you ran out of guesses! The answer was " + answer + " and there was " + attempts + " attempts.");
     }
 
     // run() will begin the execution of the guessing game. This method
@@ -125,21 +133,41 @@ public class DifficultyGuessing {
     // to allow the user to begin guessing.
     public static void run() {
 
-        System.out.println("Welcome to the guessing game!");
+        System.out.println("\nWelcome to the guessing game!");
         reader = new Scanner(System.in);
 
-        setDifficulty();
+        if(!setDifficulty())
+            return;
+    
+        System.out.println("Settings have been confirmed. Lets begin!");
+    
+        // Choose a random number
+        answer = (int) (Math.random() * range) + 1;
+        System.out.println("A number has been chosen. Start Guessing!");
+        
+        userGuessing();
+        
+    }
+
+    // run() will begin the execution of the guessing game. This method
+    // will call setDifficulty() to initialize difficulty settings, gather
+    // a random number to set as the correct answer, and call userGuessing()
+    // to allow the user to begin guessing. This version of run() is meant for
+    // testing purposes. 
+    public static int run(String testInput) {
+
+        System.out.println("Welcome to the guessing game!");
+        reader = new Scanner(testInput);
+
+        if(!setDifficulty())
+            return answer;
         
         // Choose a random number
         answer = (int) (Math.random() * range) + 1;
         System.out.println("A number has been chosen. Start Guessing!");
         
         userGuessing();
-
-        // User has run out of guesses. Close program with a message
-        System.out.println("Sorry you ran out of guesses! The answer was " + answer);
-        reader.close();
-        
+        return answer;
     }
 
 }
