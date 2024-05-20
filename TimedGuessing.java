@@ -27,7 +27,8 @@ public class TimedGuessing {
 
     // setDifficulty() asks the user via console to choose a difficulty.
     // Number 1 is associated with easy difficulty, 2 with medium,
-    // and 3 with hard.
+    // and 3 with hard. Each difficulty has their unique values for
+    // amount of guesses allowed, time limit, and ranges.
     static private void setDifficulty() {
 
         while(true) {
@@ -42,7 +43,15 @@ public class TimedGuessing {
 
             // Gather response from user.
             String response = reader.nextLine();
-            int difficulty = Integer.parseInt(response);
+
+            // Catch exception if user types a string instead of number.
+            int difficulty;
+            try {
+                difficulty = Integer.parseInt(response);
+            } catch(NumberFormatException ex) {
+                System.out.println("Invalid Response. Please enter a nubmer from 0-3.");
+                continue;
+            }
             
             // Exiting early.
             if(difficulty == 0) {
@@ -111,15 +120,11 @@ public class TimedGuessing {
                 System.out.println("Guessed correct value! Good job! Attempts: " + attempts);
                 System.exit(0);
             }
-            // If user guessed higher than correct value.
+            // If user was incorrect, let them know and hint higher or lower.
             else if(value > answer)
-            {
                 System.out.println("Incorrect. " + --guessAmount + " guesses left. (Hint: lower!)");
-            }
-            // If user guessed lower than correct value.
-            else {
+            else 
                 System.out.println("Incorrect. " + --guessAmount + " guesses left. (Hint: higher!)");
-            }
 
         }
     }
