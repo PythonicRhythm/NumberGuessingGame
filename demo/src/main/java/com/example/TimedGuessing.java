@@ -1,3 +1,4 @@
+package com.example;
 import java.util.Scanner;
 
 /**
@@ -11,40 +12,45 @@ import java.util.Scanner;
  *      Medium: Number between 1 and 100.                                                                                       X
  *      Hard: Number between 1 and 500.                                                                                         X
  *      Adjust the number of allowed attempts based on the difficulty level.                                                    X
+ * Time Challenge Mode:
+ *      Introduce a time limit for the user to guess the number.                                                                X
+ *      Display a countdown timer during the game.                                                                              X
+ *      If the user exceeds the time limit, the game ends, and the correct number is revealed.                                  X
  */
-public class DifficultyGuessing {
 
-    static private int guessAmount; // amount of attempts the user has to guess the correct answer.
-    static private int range;       // the maximum number that the random number could be (i.e 1-range)
-    static private int answer;      // the correct answer/number the user has to guess.
-    static private Scanner reader;  // console input reader.
+public class TimedGuessing {
+
+    static private int guessAmount;
+    static private int range;
+    static private int answer;
+    static private int timeLimit;
+    static private Scanner reader;
 
     // setDifficulty() asks the user via console to choose a difficulty.
     // Number 1 is associated with easy difficulty, 2 with medium,
     // and 3 with hard. Each difficulty has their unique values for
-    // amount of guesses allowed and the range of possible values.
+    // amount of guesses allowed, time limit, and ranges.
     static private void setDifficulty() {
-
-        // Explain difficulty differences to user.
-        System.out.println("Set your difficulty from Easy to Hard.");
-        System.out.println("Easy ranges from 1-50 with 30 guesses.");
-        System.out.println("Medium ranges from 1-100 with 25 guesses.");
-        System.out.println("Hard ranges from 1-500 with 10 guesses.");
-        System.out.println("(For Easy type 1, Medium 2, Hard 3, Exit 0)");
 
         while(true) {
 
+            // Explain difficulty differences to user.
+            System.out.println("Set your difficulty from Easy to Hard.");
+            System.out.println("Easy ranges from 1-50 with 30 guesses.");
+            System.out.println("Medium ranges from 1-100 with 25 guesses.");
+            System.out.println("Hard ranges from 1-500 with 10 guesses.");
+            System.out.println("(For Easy type 1, Medium 2, Hard 3, Exit 0)");
             System.out.print("> ");
 
             // Gather response from user.
             String response = reader.nextLine();
-            
-            // Catch exception if user types a string.
+
+            // Catch exception if user types a string instead of number.
             int difficulty;
             try {
                 difficulty = Integer.parseInt(response);
             } catch(NumberFormatException ex) {
-                System.out.println("Invalid Response. Please enter a number from 0-3.");
+                System.out.println("Invalid Response. Please enter a nubmer from 0-3.");
                 continue;
             }
             
@@ -53,51 +59,57 @@ public class DifficultyGuessing {
                 System.out.println("Goodbye!");
                 System.exit(0);
             }
-            // Set easy settings
+            // Set easy setting
             else if(difficulty == 1) {
                 guessAmount = 30;
                 range = 50;
+                timeLimit = 60;
                 break;
             }
-            // Set medium settings
+            // Set medium setting
             else if (difficulty == 2) {
                 guessAmount = 25;
                 range = 100;
+                timeLimit = 40;
                 break;
             }
-            // Set hard settings
+            // Set hard setting
             else if (difficulty == 3) {
                 guessAmount = 10;
                 range = 500;
+                timeLimit = 20;
                 break;
             }
             // Response was invalid.
             else {
-                System.out.println("Invalid response. Enter a number 1-3");
+                System.out.println("Invalid response. Enter a number 0-3");
             }
         }
-
-        System.out.println("Settings have been confirmed. Lets begin!");
     }
 
     // userGuessing() will gather user guesses and check if they
     // match with the random number chosen. This method will
     // also provide hints to the user such as higher or lower.
     private static void userGuessing() {
+        
+        // Initialize alternate thread that keeps track of time and time limit.
+        TimedMode timer = new TimedMode(timeLimit, answer);
+        timer.start();
+
+        // While user has more guesses, allow them to guess while
+        // keeping tracks of their amounts of attempts. If the user
+        // has exited this while loop, they ran out of guesses.
         int attempts = 0;
         while(guessAmount > 0) {
-
-            System.out.print("> ");
         
-            // Gather user response.
             String response = reader.nextLine();
-
+            
             // Catch exception if user types a string.
             int value;
             try {
                 value = Integer.parseInt(response);
-            } catch (NumberFormatException ex) {
-                System.out.println("Invalid guess. Please enter a number.");
+            } catch(NumberFormatException ex) {
+                System.out.println("Invalid Response. Please enter a number.");
                 continue;
             }
 
