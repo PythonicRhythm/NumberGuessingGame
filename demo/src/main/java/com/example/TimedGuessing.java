@@ -16,6 +16,9 @@ import java.util.Scanner;
  *      Introduce a time limit for the user to guess the number.                                                                X
  *      Display a countdown timer during the game.                                                                              X
  *      If the user exceeds the time limit, the game ends, and the correct number is revealed.                                  X
+ * 
+ * Can be called statically from other classes and run normally but I use GuessingGame.java to
+ * choose from the other modes.
  */
 
 public class TimedGuessing {
@@ -30,7 +33,7 @@ public class TimedGuessing {
     // Number 1 is associated with easy difficulty, 2 with medium,
     // and 3 with hard. Each difficulty has their unique values for
     // amount of guesses allowed, time limit, and ranges.
-    static private void setDifficulty() {
+    static private Boolean setDifficulty() {
 
         while(true) {
 
@@ -57,28 +60,28 @@ public class TimedGuessing {
             // Exiting early.
             if(difficulty == 0) {
                 System.out.println("Goodbye!");
-                System.exit(0);
+                return false;
             }
             // Set easy setting
             else if(difficulty == 1) {
                 guessAmount = 30;
                 range = 50;
                 timeLimit = 60;
-                break;
+                return true;
             }
             // Set medium setting
             else if (difficulty == 2) {
                 guessAmount = 25;
                 range = 100;
                 timeLimit = 40;
-                break;
+                return true;
             }
             // Set hard setting
             else if (difficulty == 3) {
                 guessAmount = 10;
                 range = 500;
                 timeLimit = 20;
-                break;
+                return true;
             }
             // Response was invalid.
             else {
@@ -119,7 +122,8 @@ public class TimedGuessing {
             if(value == answer)
             {
                 System.out.println("Guessed correct value! Good job! Attempts: " + attempts);
-                System.exit(0);
+                timer.setKillFlag(true);
+                return;
             }
             // If user was incorrect, let them know and hint higher or lower.
             else if(value > answer)
@@ -128,6 +132,9 @@ public class TimedGuessing {
                 System.out.println("Incorrect. " + --guessAmount + " guesses left. (Hint: higher!)");
 
         }
+
+        // User has run out of guesses. Close program with a message
+        System.out.println("Sorry you ran out of guesses! The answer was " + answer + " and there was " + attempts + " attempts.");
     }
 
     // run() will begin the execution of the guessing game. This method
@@ -136,8 +143,28 @@ public class TimedGuessing {
     // to allow the user to begin guessing.
     public static void run() {
 
-        System.out.println("Welcome to the guessing game!");
+        System.out.println("\nWelcome to the guessing game!");
         reader = new Scanner(System.in);
+
+        if(!setDifficulty())
+            return;
+        
+        // Choose a random number
+        answer = (int) (Math.random() * range) + 1;
+        System.out.println("A number has been chosen. Start Guessing!");
+        
+        userGuessing();
+        
+    }
+
+    // run() will begin the execution of the guessing game. This method
+    // will call setDifficulty() to initialize difficulty settings, gather
+    // a random number to set as the correct answer, and call userGuessing()
+    // to allow the user to begin guessing.
+    public static int run(String testInput) {
+
+        System.out.println("Welcome to the guessing game!");
+        reader = new Scanner(testInput);
 
         setDifficulty();
         
@@ -147,10 +174,7 @@ public class TimedGuessing {
         
         userGuessing();
 
-        // User has run out of guesses. Close program with a message
-        System.out.println("Sorry you ran out of guesses! The answer was " + answer);
-        reader.close();
-        
+        return answer;
     }
 
 }

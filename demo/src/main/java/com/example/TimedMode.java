@@ -11,10 +11,16 @@ public class TimedMode extends Thread {
     
     private int timeLimit;  // The maximum amount of seconds the user has to guess.
     private int answer;     // The correct answer choice the user is looking for.
+    private boolean killFlag;   // flag to kill the thread.
     
     TimedMode(int maxTime, int value) {
         timeLimit = maxTime;
         answer = value;
+        killFlag = false;
+    }
+
+    public void setKillFlag(boolean killFlag) {
+        this.killFlag = killFlag;
     }
 
     // Timer will begin once run() is called. Keeps track of current time
@@ -36,6 +42,9 @@ public class TimedMode extends Thread {
                     start = possibleSecond;
                     timeLimit--;
                 }
+                
+                // If the kill flag is set from the main thread, end the process.
+                if(killFlag) return;
             }
 
             // User has run out of time. Let them know and close the program.
