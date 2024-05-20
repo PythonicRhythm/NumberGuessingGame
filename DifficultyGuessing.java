@@ -21,7 +21,8 @@ public class DifficultyGuessing {
 
     // setDifficulty() asks the user via console to choose a difficulty.
     // Number 1 is associated with easy difficulty, 2 with medium,
-    // and 3 with hard.
+    // and 3 with hard. Each difficulty has their unique values for
+    // amount of guesses allowed and the range of possible values.
     static private void setDifficulty() {
 
         // Explain difficulty differences to user.
@@ -88,7 +89,10 @@ public class DifficultyGuessing {
 
             System.out.print("> ");
         
+            // Gather user response.
             String response = reader.nextLine();
+
+            // Catch exception if user types a string.
             int value;
             try {
                 value = Integer.parseInt(response);
@@ -96,24 +100,28 @@ public class DifficultyGuessing {
                 System.out.println("Invalid guess. Please enter a number.");
                 continue;
             }
+
             attempts++;
             
+            // If user guessed correct value.
             if(value == answer)
             {
                 System.out.println("Guessed correct value! Good job! Attempts: " + attempts);
                 System.exit(0);
             }
+            // If user was incorrect, let them know and hint higher or lower.
             else if(value > answer)
-            {
                 System.out.println("Incorrect. " + --guessAmount + " guesses left. (Hint: lower!)");
-            }
-            else {
+            else 
                 System.out.println("Incorrect. " + --guessAmount + " guesses left. (Hint: higher!)");
-            }
 
         }
     }
 
+    // run() will begin the execution of the guessing game. This method
+    // will call setDifficulty() to initialize difficulty settings, gather
+    // a random number to set as the correct answer, and call userGuessing()
+    // to allow the user to begin guessing.
     public static void run() {
 
         System.out.println("Welcome to the guessing game!");
